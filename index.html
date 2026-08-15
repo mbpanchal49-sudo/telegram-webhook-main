@@ -7,6 +7,10 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
   <!-- Meta Pixel Code -->
   <script>
     !function(f,b,e,v,n,t,s)
@@ -72,7 +76,7 @@
 
     <!-- CTA Button -->
     <div class="pt-4">
-      <a href="https://t.me/+DZ_iI3oNxIZlNzZl" id="joinBtn" class="glow-btn block w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-2xl text-lg transition duration-200 shadow-xl flex items-center justify-center space-x-3">
+      <a href="javascript:void(0);" onclick="trackAndRedirect('https://t.me/+DZ_iI3oNxIZlNzZl')" id="joinBtn" class="glow-btn block w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-2xl text-lg transition duration-200 shadow-xl flex items-center justify-center space-x-3">
         <i class="fa-brands fa-telegram text-2xl"></i>
         <span>JOIN FREE TELEGRAM</span>
       </a>
@@ -90,25 +94,40 @@
     </p>
   </footer>
 
-  <!-- Firebase Live Analytics Tracking Script -->
+  <!-- Firebase Live Firestore Tracking Script -->
   <script>
-    const DB_URL = "https://hydra-ujjawal-api-default-rtdb.firebaseio.com";
+    const firebaseConfig = {
+      apiKey: "AIzaSyBF29cqyN_SaBPj9hPU6PinKkyHS3j76oU",
+      authDomain: "telegram-conversion-tracking.firebaseapp.com",
+      projectId: "telegram-conversion-tracking",
+      storageBucket: "telegram-conversion-tracking.firebasestorage.app",
+      messagingSenderId: "979303679957",
+      appId: "1:979303679957:web:0bca44829bbeb54f56df5c"
+    };
 
-    // 1. Log Pageview
-    fetch(`${DB_URL}/analytics/pageviews.json`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ timestamp: new Date().toISOString() })
-    }).catch(e => console.error(e));
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-    // 2. Log Button Click
-    document.getElementById('joinBtn').addEventListener('click', function() {
-      fetch(`${DB_URL}/analytics/button_clicks.json`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ timestamp: new Date().toISOString() })
-      }).catch(e => console.error(e));
+    // 1. Live Pageview (Visitor) Tracking
+    window.addEventListener('DOMContentLoaded', () => {
+      db.collection("campaign_stats").add({
+        event_type: "visitor",
+        created_at: new Date().toISOString()
+      }).catch(err => console.error("Visitor logging error:", err));
     });
+
+    // 2. Live Button Click Tracking & Safe Redirect
+    function trackAndRedirect(telegramUrl) {
+      db.collection("campaign_stats").add({
+        event_type: "click",
+        created_at: new Date().toISOString()
+      }).then(() => {
+        window.location.href = telegramUrl;
+      }).catch((err) => {
+        console.error("Click logging error:", err);
+        window.location.href = telegramUrl;
+      });
+    }
   </script>
 
 </body>
