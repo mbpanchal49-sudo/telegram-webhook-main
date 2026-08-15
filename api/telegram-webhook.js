@@ -7,6 +7,7 @@ const TARGET_INVITE_LINK = "https://t.me/+DZ_iI3oNxIZlNzZl";
 const PIXEL_ID = "2190769568449496";
 const ACCESS_TOKEN = "EAAepgs3b1ZBIBSJQ9vHrCX57JhfiFF77312mCUL8Wj6az0VAwSOhBpgdLpH3y325j7lsbOUzTreAvpIOEHZALi57dJs8N9DtKn7rS7DVZAcguzexya0sU14jZCqmlPgemuL83MqSCFFNhiTrozKSzTcYsqKYC7uNT2LT9nUXD4zflHsu1jziqNmcSZAoOXAZDZD";
 const FIREBASE_DB_URL = "https://hydra-ujjawal-api-default-rtdb.firebaseio.com";
+const FIRESTORE_URL = "https://firestore.googleapis.com/v1/projects/telegram-conversion-tracking/databases/(default)/documents/campaign_stats";
 
 function hashData(data) {
     if (!data) return null;
@@ -34,6 +35,29 @@ async function markUserProcessed(telegramId, eventData) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(eventData)
     });
+}
+
+// Record Live Join event to Firestore for Real-time Dashboard
+async function logJoinToFirestore(userData) {
+    try {
+        const payload = {
+            fields: {
+                event_type: { stringValue: "join" },
+                telegram_id: { stringValue: userData.telegram_id },
+                first_name: { stringValue: userData.first_name },
+                username: { stringValue: userData.username },
+                created_at: { stringValue: userData.timestamp }
+            }
+        };
+
+        await fetch(FIRESTORE_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+    } catch (e) {
+        console.error('Firestore Join log error:', e);
+    }
 }
 
 async function sendMetaCapiEvent(userData, eventId) {
@@ -113,7 +137,8 @@ module.exports = async (req, res) => {
 
         const [capiResult] = await Promise.all([
             sendMetaCapiEvent(userData, eventId),
-            markUserProcessed(user.id, { ...userData, invite_link: inviteLinkUsed, event_id: eventId })
+            markUserProcessed(user.id, { ...userData, invite_link: inviteLinkUsed, event_id: eventId }),
+            logJoinToFirestore(userData)
         ]);
 
         return res.status(200).json({ status: 'success', event_id: eventId, meta_capi: capiResult });
