@@ -76,7 +76,7 @@
 
     <!-- CTA Button -->
     <div class="pt-4">
-      <a href="javascript:void(0);" onclick="trackAndRedirect('https://t.me/+DZ_iI3oNxIZlNzZl')" id="joinBtn" class="glow-btn block w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-2xl text-lg transition duration-200 shadow-xl flex items-center justify-center space-x-3">
+      <a href="https://t.me/+DZ_iI3oNxIZlNzZl" onclick="trackAndRedirect(event)" id="joinBtn" class="glow-btn block w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-2xl text-lg transition duration-200 shadow-xl flex items-center justify-center space-x-3">
         <i class="fa-brands fa-telegram text-2xl"></i>
         <span>JOIN FREE TELEGRAM</span>
       </a>
@@ -94,7 +94,7 @@
     </p>
   </footer>
 
-  <!-- Firebase Live Firestore Tracking Script -->
+  <!-- Firebase Tracking Script -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBF29cqyN_SaBPj9hPU6PinKkyHS3j76oU",
@@ -108,25 +108,27 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // 1. Live Pageview (Visitor) Tracking
+    // 1. Visitor Tracking
     window.addEventListener('DOMContentLoaded', () => {
       db.collection("campaign_stats").add({
         event_type: "visitor",
         created_at: new Date().toISOString()
-      }).catch(err => console.error("Visitor logging error:", err));
+      }).catch(err => console.error(err));
     });
 
-    // 2. Live Button Click Tracking & Safe Redirect
-    function trackAndRedirect(telegramUrl) {
+    // 2. Fast Non-blocking Tracking & Direct Redirect
+    function trackAndRedirect(event) {
+      event.preventDefault();
+      const targetUrl = "https://t.me/+DZ_iI3oNxIZlNzZl";
+
+      // Background Log to Firestore (non-blocking)
       db.collection("campaign_stats").add({
         event_type: "click",
         created_at: new Date().toISOString()
-      }).then(() => {
-        window.location.href = telegramUrl;
-      }).catch((err) => {
-        console.error("Click logging error:", err);
-        window.location.href = telegramUrl;
-      });
+      }).catch(err => console.error(err));
+
+      // Direct open in location or new tab instantly
+      window.location.href = targetUrl;
     }
   </script>
 
