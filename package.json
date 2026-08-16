@@ -1,8 +1,9 @@
 {
   "name": "telegram-webhook",
   "version": "1.0.0",
-  "private": true,
+  "description": "Telegram webhook for tracking join requests",
+  "main": "api/telegram-webhook.js",
   "dependencies": {
-    "node-fetch": "^2.6.7"
+    "firebase-admin": "^11.8.0"
   }
 }
