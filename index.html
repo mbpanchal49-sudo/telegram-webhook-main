@@ -108,27 +108,33 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // 1. Visitor Tracking
+    // 1. Visitor Tracking on Page Load
     window.addEventListener('DOMContentLoaded', () => {
       db.collection("campaign_stats").add({
         event_type: "visitor",
         created_at: new Date().toISOString()
-      }).catch(err => console.error(err));
+      }).then(() => {
+        console.log("Visitor tracked successfully");
+      }).catch(err => console.error("Visitor track error:", err));
     });
 
-    // 2. Fast Non-blocking Tracking & Direct Redirect
+    // 2. Click Tracking & Direct Redirect
     function trackAndRedirect(event) {
       event.preventDefault();
       const targetUrl = "https://t.me/+DZ_iI3oNxIZlNzZl";
 
-      // Background Log to Firestore (non-blocking)
+      console.log("Join button clicked, logging click to Firestore...");
+
       db.collection("campaign_stats").add({
         event_type: "click",
         created_at: new Date().toISOString()
-      }).catch(err => console.error(err));
-
-      // Direct open in location or new tab instantly
-      window.location.href = targetUrl;
+      }).then(() => {
+        console.log("Click saved successfully, redirecting...");
+        window.location.href = targetUrl;
+      }).catch(err => {
+        console.error("Click tracking error:", err);
+        window.location.href = targetUrl; // Error hone par bhi user telegram par chala jayega
+      });
     }
   </script>
 
