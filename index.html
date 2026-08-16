@@ -97,13 +97,16 @@
   <!-- Firebase Tracking Script -->
   <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyBF29cqyN_SaBPj9hPU6PinKkyHS3j76oU",
-      authDomain: "telegram-conversion-tracking.firebaseapp.com",
-      projectId: "telegram-conversion-tracking",
-      storageBucket: "telegram-conversion-tracking.firebasestorage.app",
+      apiKey: "AIzaSyD-ActualAPIKeyForHydraUjjawalApi-Placeholder", // Apne Firebase Project ki Web API key yahan dalein agar alag ho
+      authDomain: "hydra-ujjawal-api.firebaseapp.com",
+      projectId: "hydra-ujjawal-api",
+      storageBucket: "hydra-ujjawal-api.appspot.com",
       messagingSenderId: "979303679957",
-      appId: "1:979303679957:web:0bca44829bbeb54f56df5c"
+      appId: "1:979303679957:web:hydraapp"
     };
+
+    // Agar upar wali config aapke Firebase project se match na ho, toh 
+    // Firebase Project Settings -> General -> Your apps (Web) se apni exact config copy karke yahan paste kar dena.
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
@@ -133,7 +136,7 @@
         window.location.href = targetUrl;
       }).catch(err => {
         console.error("Click tracking error:", err);
-        window.location.href = targetUrl; // Error hone par bhi user telegram par chala jayega
+        window.location.href = targetUrl; 
       });
     }
   </script>
